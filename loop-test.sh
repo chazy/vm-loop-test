@@ -92,7 +92,7 @@ done
 iter=1
 while $RUN;
 do
-	echo "\n === Running $J guest(s): Round: $iter ==="
+	echo "\n === Running $J guest(s): Round: $iter ($IMGDIR) ==="
 
 	for i in `seq 0 $((J - 1))`; do
 		GUEST=$i FS="${imgs[$i]}" IMGDIR="$IMGDIR" setsid ./test-guest.sh $@ &
