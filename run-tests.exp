@@ -29,19 +29,17 @@ expect {
 
 		send "./hackbench $hackbench_groups process $hackbench_loops\n"
 		expect {
-			timeout { report_fail 2 "Did not see hackbench start. Error." }
+			timeout { report_fail 2 "Did not see hackbench finish. Error." }
 			"./hackbench: No such file or directory" {
 				send "halt -p\n"
 				report_fail 3 "Missing hackbench in guest filesystem"
 			}
-			"Running with"
-		}
-		expect {
-			timeout { report_fail 4 "Did not see hackbench finish" }
-			"Time:*\n"
-		}
-		expect {
-			timeout { report_fail 4 "Did not see prompt after hackbench" }
+			"error" {
+				send "halt -p\n"
+				report_fail 4 "Error executing hackbench.  Too many processes?"
+			}
+			"Running with" { exp_continue }
+			"Time:*\n" { exp_continue }
 			"root@*:*#"
 		}
 		status_output "hackbench successfully completed"
