@@ -1,6 +1,7 @@
 *.qcow2
 debian-sid
 qemu-system-aarch64
+qemu
 linux
 Image
 tmp-*

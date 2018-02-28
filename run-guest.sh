@@ -1,8 +1,8 @@
 #!/bin/bash
 
 CONSOLE=mon:stdio
-SMP=2
-MEMSIZE=$((2 * 1024))
+SMP=16
+MEMSIZE=$((14 * 1024))
 KERNEL=Image
 FS=debian-sid.qcow2
 CMDLINE=""
@@ -10,6 +10,7 @@ DUMPDTB=""
 DTB=""
 QMP=""
 ALTCON=""
+LOGFILE=""
 GIC_VERSION=host
 IRQCHIP="kernel_irqchip=on"
 
@@ -26,6 +27,8 @@ usage() {
 	U="$U    --fs <image>:          Guest file system (default $FS)\n"
 	U="$U    -s | --serial <file>:  Output console to <file>\n"
 	U="$U    -a | --append <snip>:  Add <snip> to the kernel cmdline\n"
+	U="$U    --console <port>:      Listen for ttyAMA0 console on telnet <port> instead of stdout\n"
+	U="$U    --console-log <path>:  Also log ttyAMA0 console to <path>\n"
 	U="$U    --alt-console <port>:  Listen for virtio console on telnet <port>\n"
 	U="$U    --userirq:             Use a userspace irqchip\n"
 	U="$U    --gicv2:               Run GICv2 guest even on GICv3 host\n"
@@ -84,6 +87,14 @@ do
 		GIC_VERSION=2
 		shift 1
 		;;
+	  --console-log)
+		LOGFILE=",logfile=$2"
+		shift 2
+		;;
+	  --console)
+		CONSOLE="chardev:con0 -chardev socket,server,host=*,port=$2,telnet,id=con0"
+		shift 2
+		;;
 	  --alt-console)
 		PORT="$2"
 		ALTCON="-chardev socket,server,host=*,nowait,port=$PORT,telnet,id=mychardev"
@@ -109,7 +120,7 @@ do
 	esac
 done
 
-./qemu-system-aarch64 \
+exec ./qemu-system-aarch64 \
         -smp $SMP -m $MEMSIZE -machine virt,gic-version=${GIC_VERSION},${IRQCHIP}${DUMPDTB} -cpu host \
         -kernel ${KERNEL} -enable-kvm ${DTB} \
         -drive if=none,file=$FS,id=vda,format=qcow2,cache=none \
@@ -118,7 +129,7 @@ done
         -device virtio-net-pci,netdev=net0,rombar=0 \
 	$QMP \
         -display none \
-	-serial $CONSOLE \
+	-serial ${CONSOLE}${LOGFILE} \
 	$ALTCON \
 	-append "console=ttyAMA0 root=/dev/vda1 rw $CMDLINE earlycon"
 

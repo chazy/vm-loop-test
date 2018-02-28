@@ -1,0 +1,11 @@
+proc status_output { status_string } {
+    global guest
+    send_error "$guest: $status_string\n"
+}
+
+proc report_fail { error_code error_string } {
+    status_output "$error_string"
+    set timeout -1
+    expect eof
+    exit $error_code
+}

@@ -92,13 +92,10 @@ done
 iter=1
 while $RUN;
 do
-	echo "Running $J guest(s): Round: $iter"
+	echo "\n === Running $J guest(s): Round: $iter ==="
 
 	for i in `seq 0 $((J - 1))`; do
-		setsid expect hackbench-shutdown.exp \
-			"guest$i" \
-			--fs ${imgs[$i]} \
-			--alt-console $((5000 + i)) $@ > ${logs[$i]} &
+		GUEST=$i FS="${imgs[$i]}" IMGDIR="$IMGDIR" setsid ./test-guest.sh $@ &
 		pids[$i]=$!
 	done
 

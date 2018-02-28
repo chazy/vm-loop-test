@@ -1,0 +1,26 @@
+#!/usr/bin/expect -f
+
+set guest [lindex $argv 0]
+set port [lindex $argv 1]
+
+spawn telnet localhost $port
+set exit_code 0
+
+source logging.exp
+
+set timeout 30
+expect {
+	timeout { report_fail 1 "Not seeing Linux booting" }
+	"Booting Linux" {
+		status_output "Saw \"Booting Linux...\""
+		expect {
+			timeout {
+				report_fail 1 "Not seeing login prompt"
+			}
+			"Last login:" { exp_continue }
+			"login:" { status_output "Saw login prompt..."; }
+		}
+	}
+}
+
+exit $exit_code

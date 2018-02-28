@@ -1,0 +1,66 @@
+#!/usr/bin/expect -f
+
+set guest [lindex $argv 0]
+set port [lindex $argv 1]
+
+spawn telnet localhost $port
+set exit_code 0
+
+source logging.exp
+
+set timeout 180
+set first_run 1
+
+# You may want lower values here on less powerful systems (like models)
+set hackbench_groups 200
+set hackbench_loops 100
+
+
+send "\r"
+
+expect {
+	timeout {
+		report_fail 1 "Not seeing login prompt or incorrect username/password"
+	}
+	"Last login:" { exp_continue }
+	"login:" { send "root\n"; exp_continue }
+	"Password:" { send "kvm\n"; exp_continue }
+	"root@*:*# $" {
+
+		send "./hackbench $hackbench_groups process $hackbench_loops\n"
+		expect {
+			timeout { report_fail 2 "Did not see hackbench start. Error." }
+			"./hackbench: No such file or directory" {
+				send "halt -p\n"
+				report_fail 3 "Missing hackbench in guest filesystem"
+			}
+			"Running with"
+		}
+		expect {
+			timeout { report_fail 4 "Did not see hackbench finish" }
+			"Time:*\n"
+		}
+		expect {
+			timeout { report_fail 4 "Did not see prompt after hackbench" }
+			"root@*:*#"
+		}
+		status_output "hackbench successfully completed"
+
+		send "cyclictest -t `nproc` -l 10000 -q\n"
+		expect {
+			timeout { report_fail 6 "Never saw prompt after cyclictest" }
+			"root@*:*#"
+		}
+		status_output "cyclictest successfully completed"
+
+		if { $first_run == 1 } {
+			set first_run 0
+			send "reboot\n"
+			exp_continue
+		} else {
+			send "halt -p\n"
+		}
+	}
+}
+
+exit $exit_code
