@@ -1,7 +1,7 @@
 #!/bin/bash
 
 guest_num=${GUEST:=0}
-fs=${FS:=debian-sid.qcow2}
+fs=${FS:=debian-stretch.qcow2}
 imgdir=${IMGDIR:=/tmp}
 
 conport=$((5000 + (guest_num * 2) ))

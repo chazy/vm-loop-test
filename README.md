@@ -12,7 +12,7 @@ test with ctrl+C, in which case the script will wait for the VMs to shut down
 and exit cleanly.
 
 A number of files are required in this directory to run the test:
-* debian-sid.qcow2: a qcow2 guest file system image used to create shallow
+* debian-arm64.qcow2: a qcow2 guest file system image used to create shallow
   clones (using the main file system as a backing file for each guest instance).
   This FS must support logging in with root/kvm as the root user/password.
 * Image: a guest kernel named 'Image'

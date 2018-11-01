@@ -1,5 +1,5 @@
 *.qcow2
-debian-sid
+debian-arm64
 qemu-system-aarch64
 qemu
 linux

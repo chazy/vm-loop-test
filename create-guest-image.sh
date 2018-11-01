@@ -44,7 +44,7 @@ fi
 
 if [[ ! -d "$NAME" ]]; then
 	echo "Debootstapping a debian directory for you..."
-	sudo debootstrap --arch arm64 sid `pwd`/"$NAME" http://ftp.debian.org/debian ||
+	sudo debootstrap --arch arm64 stretch `pwd`/"$NAME" http://ftp.debian.org/debian ||
 		error_exit "debootstrap failed"
 	echo "root:kvm" | sudo chpasswd --root `pwd`/"$NAME"
 fi

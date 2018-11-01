@@ -24,8 +24,8 @@ do
 done
 
 # Let's make sure we have a guest file system
-if [[ ! -e debian-sid.qcow2 ]]; then
-	./create-guest-image.sh debian-sid || exit $?
+if [[ ! -e debian-arm64.qcow2 ]]; then
+	./create-guest-image.sh debian-arm64 || exit $?
 fi
 
 # Let's make sure we have a guest kernel

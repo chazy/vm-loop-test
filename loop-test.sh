@@ -3,7 +3,7 @@
 ############################# Init and configuration ##################
 RESULT=0
 J=1
-FS=debian-sid.qcow2
+FS=debian-arm64.qcow2
 
 usage() {
 	U=""
